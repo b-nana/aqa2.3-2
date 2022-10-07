@@ -1,57 +1,56 @@
 package ru.netology.test;
 
+import com.codeborne.selenide.Condition;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import ru.netology.data.RegistrationDto;
+import ru.netology.data.DataGenerator;
+import ru.netology.data.UserInfo;
 
 import static com.codeborne.selenide.Condition.text;
 import static com.codeborne.selenide.Selenide.$;
 import static com.codeborne.selenide.Selenide.open;
-import static ru.netology.data.DataGenerator.generateInvalidUser;
-import static ru.netology.data.DataGenerator.generateValidUser;
-
-public class AuthTest {
 
 
+class AuthTest {
+    @BeforeEach
+    void shouldOpenWebApp() {
+        open("http://localhost:9999");
+    }
 
     @Test
     void shouldLogin() {
-        RegistrationDto validUser = generateValidUser("en");
-        open("http://localhost:9999");
-        $("[data-test-id=login] input").setValue(validUser.getLogin());
-        $("[data-test-id=password] input").setValue(validUser.getPassword());
+        UserInfo user = DataGenerator.regUser("active");
+        $("[data-test-id=login] input").setValue(user.getLogin());
+        $("[data-test-id=password] input").setValue(user.getPassword());
         $("button.button").click();
         $("h2.heading").shouldHave(text("Личный кабинет"));
     }
 
     @Test
     void shouldNotLoginAsBlocked() {
-        RegistrationDto invalidUser = generateInvalidUser("en");
-        open("http://localhost:9999/");
-        $("[data-test-id=login] input").setValue(invalidUser.getLogin());
-        $("[data-test-id=password] input").setValue(invalidUser.getPassword());
+        UserInfo user = DataGenerator.regUser("blocked");
+        $("[data-test-id=login] input").setValue(user.getLogin());
+        $("[data-test-id=password] input").setValue(user.getPassword());
         $("button.button").click();
-        $("[data-test-id=error-notification]").shouldHave(text("Ошибка"));
+        $("[data-test-id=error-notification]").shouldHave(text("Пользователь заблокирован"));
     }
 
     @Test
     void shouldNotLoginWithWrongPassword() {
-        RegistrationDto validUser = generateValidUser("en");
-        RegistrationDto invalidUser = generateInvalidUser("en");
-        open("http://localhost:9999/");
-        $("[data-test-id=login] input").setValue(validUser.getLogin());
-        $("[data-test-id=password] input").setValue(invalidUser.getPassword());
+        UserInfo user = DataGenerator.regUser("active");
+        $("[data-test-id=login] input").setValue(DataGenerator.userLogin());
+        $("[data-test-id=password] input").setValue(user.getPassword());
         $("button.button").click();
-        $("[data-test-id=error-notification]").shouldHave(text("Ошибка"));
+        $("[data-test-id=error-notification]").shouldHave(text("Неверно указан логин или пароль"));
     }
 
     @Test
     void shouldNotLoginWithWrongLogin() {
-        RegistrationDto validUser = generateValidUser("en");
-        RegistrationDto invalidUser = generateInvalidUser("en");
-        open("http://localhost:9999/");
-        $("[data-test-id=login] input").setValue(invalidUser.getLogin());
-        $("[data-test-id=password] input").setValue(validUser.getPassword());
+        UserInfo user = DataGenerator.regUser("active");
+        $("[data-test-id=login] input").setValue(user.getLogin());
+        $("[data-test-id=password] input").setValue(DataGenerator.userPas());
         $("button.button").click();
-        $("[data-test-id=error-notification]").shouldHave(text("Ошибка"));
+        $("[data-test-id=error-notification]").shouldHave(text("Неверно указан логин или пароль"));
     }
+
 }

@@ -1,6 +1,0 @@
-ru/netology/data/DataGenerator.java
- ru.netology.data.DataGenerator
-ru/netology/data/RegistrationDto.java
- ru.netology.data.RegistrationDto
-ru/netology/test/AuthTest.java
- ru.netology.test.AuthTest

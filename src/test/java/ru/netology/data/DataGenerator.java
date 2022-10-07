@@ -11,6 +11,9 @@ import java.util.Locale;
 import static io.restassured.RestAssured.given;
 
 public class DataGenerator {
+
+    private static Faker faker = new Faker(new Locale("en"));
+
     public static RequestSpecification requestSpec = new RequestSpecBuilder()
             .setBaseUri("http://localhost")
             .setPort(9999)
@@ -22,36 +25,31 @@ public class DataGenerator {
     private DataGenerator() {
     }
 
-    public static void setupUser(RegistrationDto registrationDto) {
-        given().spec(requestSpec)
-                .body(registrationDto)
+    public static void newUser(UserInfo registration) {
+        given()
+                .spec(requestSpec)
+                .body(registration)
                 .when()
                 .post("/api/system/users")
                 .then()
                 .statusCode(200);
     }
 
-    public static String getLogin(String locale) {
-        Faker faker = new Faker(new Locale(locale));
+    public static String userLogin() {
         return faker.name().username();
     }
 
-    public static String getPassword(String locale) {
-        Faker faker = new Faker(new Locale(locale));
+    public static String userPas() {
         return faker.internet().password();
     }
 
-    public static RegistrationDto generateValidUser(String locale) {
-        RegistrationDto registrationDto = new RegistrationDto(getLogin(locale), getPassword(locale), "active");
-        setupUser(registrationDto);
-        return registrationDto;
+    public static UserInfo regUser(String status) {
+        String login = faker.name().username();
+        ;
+        String password = faker.internet().password();
+        UserInfo registration = new UserInfo(login, password, status);
+        newUser(registration);
+        return registration;
     }
-
-    public static RegistrationDto generateInvalidUser(String locale) {
-        RegistrationDto registrationDto = new RegistrationDto(getLogin(locale), getPassword(locale), "blocked");
-        setupUser(registrationDto);
-        return registrationDto;
-    }
-
 
 }
